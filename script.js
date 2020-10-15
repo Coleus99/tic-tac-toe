@@ -5,9 +5,10 @@ Only need to expose the Gameboard playmove function for players to use, don't wa
 allow access to squares array
 */
 const Gameboard = (() => {
-    const squares = [['x','o','x'],['o','x','o'],['x','o','x']];
+    const squares = [[,,],[,,],[,,]];
     const boardOuter = document.querySelector('.board');
     function createBoard(){
+        boardOuter.innerHTML='';
         for (let i=0; i<3; i++){
             let rowDiv = document.createElement('div');
             rowDiv.classList.add('row');
@@ -22,50 +23,85 @@ const Gameboard = (() => {
             boardOuter.appendChild(rowDiv);
         }
     }
+    function checkWin(){
+        for (let i=0; i<3; i++){
+            if(squares[i][0]===squares[i][1] && squares[i][0]===squares[i][2]){
+                return squares[i][0] || 'no winner yet';
+            }
+            else if(squares[0][i]===squares[1][i] && squares[0][i]===squares[2][i]){
+                return squares[0][i] || 'no winner yet';
+            }
+            else if(squares[0][0]===squares[1][1] && squares[0][0]===squares[2][2]){
+                return squares[0][0] || 'no winner yet';
+            }
+            else if(squares[0][2]===squares[1][1] && squares[0][2]===squares[2][0]){
+                return squares[0][2] || 'no winner yet';
+            }
+            else {
+                return 'no winner yet';
+            }
+        }
+    }
+    let moveCount = 0;
     function playMove(row, column, symbol){
-        // Need to flesh out this function with user input from the player function
-        createBoard();
+        if(squares[row][column]===undefined){
+            squares[row][column] = symbol;
+            createBoard();
+            moveCount++;
+            console.log(checkWin());
+        }
     };
     return {
-        playMove
+        createBoard,
+        playMove,
+        boardOuter,
+        moveCount
     }
 })();
 
-Gameboard.playMove();
+const game = (round) => {
+    // factory for game as can be rerun
+    start = () => {
+        Gameboard.createBoard();
+    }
+    const getRound = () => round;
+    const playerList = [];
+    let currentPlayer= playerList[0]
+    return {
+        start,
+        playerList,
+        currentPlayer
+    }
+};
 
-// const Gameboard = (() => {
-//     //create board using module as will only be called once;
-//     const squares = ['x','o','x','o','x','o','x','o','x'];
-//     const [[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]] = squares;
-//     return {
-//         gameboard
-//     }
-// })();
+const player = (name) => {
+    //use factory function as will be called multiple times
+    const getName = () => name;
+    const playerSymbol = game.playerList.length>0 ? 'o' : 'x';
+    game.playerList.push(name);
+    const move = (x,y) => {
+        Gameboard.playMove(x,y,playerSymbol);
+    }
+    return {
+        move
+    }
+};
 
-// const displayController = (() => {
-//     const output = document.querySelector('.output');
-//     const updateBoard = () => {
-//         for (let position of Gameboard.gameboard){
-//             let square = document.createElement('div');
-//             square.classList.add(position);
-//             square.textContent=Gameboard.gameboard[position];
-//             output.appendChild(square)
-//         }
-//     };
-//     return {
-//         updateBoard
-//     }
-// })();
+const player1 = player('player1');
+const player2 = player('player2');
+// player1.move(0,0);
+// player2.move(1,1);
 
-// const player(name) => {
-//     //use factory function as will be called multiple times
-//     const getName = () => name;
-//     const move = (x,y) => {
-//         // update the gameboard square[x,y] 
-//     }
-// }
-
-// const game() => {
-//     // factory for game as can be rerun
-
-// }
+const displayController = (() => {
+    let gameCount = 1;
+    let startButton = document.querySelector('button#gameStart');
+    startButton.addEventListener('click', function(event){
+        event.preventDefault()
+        let gameCount = game(gameCount);
+        gameCount.start();
+        gameCount++;
+    });
+    Gameboard.boardOuter.addEventListener('click',function(event){
+        player1.move((event.target.getAttribute('row')),(event.target.getAttribute('column')));
+    });
+})();

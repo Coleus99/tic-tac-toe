@@ -5,9 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naughts and Crosses Online</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
-<body>
-    <div class="board"></div>
+<body class="bg-light mt-5">
+    <div class="container">
+        <form class="gameSetup">
+            <div class="form-group">
+                <label for="player1">Player 1:</label>
+                <input type="text" name="player1" id="player1">
+            </div>
+            <div class="form-group">
+                <label for="player2">Player 2:</label>
+                <input type="text" name="player2" id="player1">
+            </div>
+            <button id="gameStart" class="btn btn-primary">Start Game</button>
+        </form>
+        <div class="board"></div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
