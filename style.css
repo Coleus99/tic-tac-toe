@@ -1,5 +1,7 @@
-.row{
+.board{
     display: flex;
+    flex-wrap: wrap;
+    width: 156px
 }
 .cell{
     height: 50px;

@@ -59,11 +59,13 @@ const Gameboard = (() => {
     }
 })();
 
-const game = (round) => {
+const game = ((round) => {
     // factory for game as can be rerun
     start = () => {
         Gameboard.createBoard();
     }
+    const player1 = player('player1');
+    const player2 = player('player2');
     const getRound = () => round;
     const playerList = [];
     let currentPlayer= playerList[0]
@@ -72,7 +74,7 @@ const game = (round) => {
         playerList,
         currentPlayer
     }
-};
+})();
 
 const player = (name) => {
     //use factory function as will be called multiple times
@@ -85,21 +87,15 @@ const player = (name) => {
     return {
         move
     }
-};
-
-const player1 = player('player1');
-const player2 = player('player2');
-// player1.move(0,0);
-// player2.move(1,1);
+}
 
 const displayController = (() => {
-    let gameCount = 1;
     let startButton = document.querySelector('button#gameStart');
     startButton.addEventListener('click', function(event){
         event.preventDefault()
-        let gameCount = game(gameCount);
-        gameCount.start();
-        gameCount++;
+        let playerOne = document.querySelector('#player1');
+        let playerTwo = document.querySelector('#player2');
+        game.start(playerOne.value, playerTwo.value)
     });
     Gameboard.boardOuter.addEventListener('click',function(event){
         player1.move((event.target.getAttribute('row')),(event.target.getAttribute('column')));
