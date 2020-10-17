@@ -1,9 +1,15 @@
-/*
-Split array into 3x subarrays to make it easier to clarify which cell we are targeting 
-and should help with deciding winner. 
-Only need to expose the Gameboard playmove function for players to use, don't want to 
-allow access to squares array
-*/
+const playerFactory = (name) => {
+    const getName = () => name;
+    const playerSymbol = game.playerList.length>0 ? 'o' : 'x';
+    game.playerList.push(name);
+    const move = (x,y) => {
+        Gameboard.playMove(x,y,playerSymbol);
+    }
+    return {
+        move
+    }
+}
+
 const Gameboard = (() => {
     const squares = [[,,],[,,],[,,]];
     const boardOuter = document.querySelector('.board');
@@ -60,7 +66,6 @@ const Gameboard = (() => {
 })();
 
 const game = ((round) => {
-    // factory for game as can be rerun
     start = () => {
         Gameboard.createBoard();
     }
@@ -75,19 +80,6 @@ const game = ((round) => {
         currentPlayer
     }
 })();
-
-const player = (name) => {
-    //use factory function as will be called multiple times
-    const getName = () => name;
-    const playerSymbol = game.playerList.length>0 ? 'o' : 'x';
-    game.playerList.push(name);
-    const move = (x,y) => {
-        Gameboard.playMove(x,y,playerSymbol);
-    }
-    return {
-        move
-    }
-}
 
 const displayController = (() => {
     let startButton = document.querySelector('button#gameStart');

@@ -11,3 +11,10 @@
     align-items: center;
     justify-content: center;
 }
+form.gameSetup{
+    display: flex;
+    flex-direction: column;
+}
+.hidden{
+    display:none!important;
+}
