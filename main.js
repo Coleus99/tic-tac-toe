@@ -9,20 +9,30 @@ const playerFactory = (name,symbol) => {
 //object storing game status
 const game = (() => {
     let gameCount = 0;
+    let moveCount, currentMove;
     let moves = [];
     const setPlayers = (name1, name2) => {
         player1 = playerFactory(name1,'x');
-        player2 = playerFactory(name2,'0');
-    }
+        player2 = playerFactory(name2,'o');
+    };
     const start = () => {
         gameCount+=1;
         moves=[,,,,,,,,]
         interface.output.initiateBoard();
-        let moveCount = 1;
-        let currentMove = (gameCount%2===1? player1.getName():player2.getName());
-        interface.output.statusUpdate(`${currentMove}'s turn!`)
+        moveCount=1;
+        getNextTurn();
     };
-    return{moves,setPlayers,start};
+    const getNextTurn = () => {
+        currentMove = (moveCount%2===1? player1 : player2);
+        interface.output.statusUpdate(`${currentMove.getName()}'s turn!`)
+    }
+    const playMove = (index) => {
+        moves[index] = currentMove.getSymbol();
+        interface.output.updateSquare(index,currentMove.getSymbol());
+        moveCount+=1;
+        getNextTurn();
+    };
+    return{setPlayers,start,playMove};
 })();
 
 //input & display object
@@ -30,18 +40,24 @@ const interface = (() => {
     let board = document.querySelector('.board')
     const input = (() => {
         let form=document.querySelector('.gameSetup');
-        let player1, player2;
+        // let player1, player2;
         form.addEventListener('submit', function(event){
             event.preventDefault();
             game.setPlayers(event.target.elements.player1.value,event.target.elements.player2.value);
             game.start();
             form.classList.toggle('d-none');
         });
+        board.addEventListener('click', function(event){
+            if(event.target.textContent===''){
+                game.playMove(event.target.getAttribute('index'));
+            }
+        });
         return {}
     })();
     const output = (() => {
         const initiateBoard = () => {
-            for(let i=1; i<10; i++){
+            board.innerHTML='';
+            for(let i=0; i<9; i++){
                 const square = document.createElement('div');
                 square.classList.add('cell');
                 square.setAttribute('index',i);
@@ -52,7 +68,12 @@ const interface = (() => {
         const statusUpdate = message => {
             status.textContent=message;
         };
-        return {initiateBoard,statusUpdate}
+        const updateSquare = (index,symbol) => {
+            const squares = document.querySelectorAll(`.cell`);
+            const targetSquare = squares[index];
+            targetSquare.textContent=symbol;
+        };
+        return {initiateBoard,statusUpdate,updateSquare}
     })();
     return {input,output}
 })();
