@@ -32,6 +32,11 @@ const game = (() => {
         moveCount+=1;
         if (checkWin()===true){
             interface.output.statusUpdate(`${currentMove.getName()} wins!`)
+            interface.output.toggleControls();
+        }
+        else if (moveCount>9){
+            interface.output.statusUpdate(`It's a draw.`)
+            interface.output.toggleControls();
         }
         else {
             getNextTurn();
@@ -75,19 +80,33 @@ const interface = (() => {
         board.addEventListener('click', function(event){
             if(event.target.textContent==='' && game.checkWin()!==true){
                 game.playMove(event.target.getAttribute('index'));
+            };
+        });
+        const controls = document.querySelector('.controls');
+        controls.addEventListener('click',function(event){
+            console.log(event);
+            if (event.target.id==='replay'){
+                board.innerHTML='';
+                controls.classList.toggle('d-none');
+                game.start();
+            }
+            if (event.target.id==='restart'){
+                board.innerHTML='';
+                output.statusUpdate(``);
+                controls.classList.toggle('d-none');
+                form.classList.toggle('d-none');
             }
         });
-        return {}
+        return {controls};
     })();
     const output = (() => {
         const initiateBoard = () => {
-            board.innerHTML='';
             for(let i=0; i<9; i++){
                 const square = document.createElement('div');
                 square.classList.add('cell');
                 square.setAttribute('index',i);
                 board.appendChild(square)
-            }
+            };
         };
         const status=document.querySelector('.status p');
         const statusUpdate = message => {
@@ -98,7 +117,10 @@ const interface = (() => {
             const targetSquare = squares[index];
             targetSquare.textContent=symbol;
         };
-        return {initiateBoard,statusUpdate,updateSquare}
+        const toggleControls = () => {
+            input.controls.classList.toggle('d-none');
+        }
+        return {initiateBoard,statusUpdate,updateSquare,toggleControls}
     })();
     return {input,output}
 })();
