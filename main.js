@@ -23,7 +23,8 @@ const game = (() => {
         getNextTurn();
     };
     const getNextTurn = () => {
-        currentMove = (moveCount%2===1? player1 : player2);
+        console.log(`gamecount: ${gameCount} - movecount: ${moveCount}`)
+        currentMove = ((moveCount+gameCount)%2==0? player1 : player2);
         interface.output.statusUpdate(`${currentMove.getName()}'s turn.`)
     }
     const playMove = (index) => {
