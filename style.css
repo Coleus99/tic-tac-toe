@@ -1,13 +1,26 @@
+@font-face {
+    font-family: 'crayon';
+    src: url('DkCoolCrayon.ttf') format('truetype');
+  }
+
+body{
+    background-image: url('blackboardBG.jpg');
+}
+body .container{
+    font-family: 'crayon',sans-serif;
+    color: white;
+    font-size: 24px;
+}
 .board{
     display: flex;
     flex-wrap: wrap;
     width: 300px;
+    background-image: url('hashtagChalk.svg');
 }
 .cell{
     height: 100px;
     width: 100px;
     font-size: 72px;
-    border: 1px solid black;
     display: flex;
     align-items: center;
     justify-content: center;

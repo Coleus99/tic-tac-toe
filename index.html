@@ -7,22 +7,31 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
-<body class="bg-light mt-5">
+<body class="bg-light">
     <div class="container d-flex flex-column justify-content-center align-items-center">
-        <div class="jumbotron bg-light">
-            <h1>Naughts & Crosses</h1>
+        <div class="jumbotron bg-transparent">
+            <h1>NAUGHTS & CROSSES</h1>
         </div>
         <form class="gameSetup">
-            <div class="form-group">
-                <label for="player1">Player 1:</label>
-                <input type="text" name="player1" id="player1" required>
+            <div class="form-row align-items-center">
+              <div class="col-auto">
+                <input type="text" name="player1" id="player1" placeholder="Player 1">
+              </div>
             </div>
-            <div class="form-group">
-                <label for="player2">Player 2:</label>
-                <input type="text" name="player2" id="player2" required>
+            <span>-- vs --</span>
+            <div class="form-row align-items-center">
+              <div class="col-auto">
+                <input type="text" name="player2" id="player2" placeholder="Player 2">
+              </div>
+              <div class="col-auto">
+                <div class="form-check mb-2 d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">AI</label>
+                </div>
+              </div>
             </div>
-            <button id="gameStart" class="btn btn-primary">Start Game</button>
-        </form>
+            <button id="gameStart" class="btn btn-primary mt-2">Start Game</button>
+          </form>
         <div class="status"><p></p></div>
         <div class="board"></div>
     </div>
