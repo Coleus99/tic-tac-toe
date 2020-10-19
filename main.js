@@ -1,9 +1,9 @@
 // factory function to create players
-const playerFactory = (name,symbol) => {
+const playerFactory = (name,symbol,AIstatus) => {
     const getName = () => {return name};
     const getSymbol = () => {return symbol};
-    const score = 0;
-    return {getName,getSymbol,score}
+    const getAIstatus =() => {return AIstatus};
+    return {getName,getSymbol,getAIstatus}
 };
 
 //object storing game status
@@ -11,9 +11,10 @@ const game = (() => {
     let gameCount = 0;
     let moveCount, currentMove;
     let moves = [];
-    const setPlayers = (name1, name2) => {
-        player1 = playerFactory(name1,'x');
-        player2 = playerFactory(name2,'o');
+    let AIpause = false;
+    const setPlayers = (name1, AIstatus1, name2, AIstatus2) => {
+        player1 = playerFactory(name1,'x',AIstatus1);
+        player2 = playerFactory(name2,'o',AIstatus2);
     };
     const start = () => {
         gameCount+=1;
@@ -23,14 +24,26 @@ const game = (() => {
         getNextTurn();
     };
     const getNextTurn = () => {
-        console.log(`gamecount: ${gameCount} - movecount: ${moveCount}`)
         currentMove = ((moveCount+gameCount)%2==0? player1 : player2);
-        interface.output.statusUpdate(`${currentMove.getName()}'s turn.`)
+        interface.output.statusUpdate(`${currentMove.getName()}'s ${currentMove.getAIstatus()? 'thinking':'turn'}`)
+        if(currentMove.getAIstatus()){
+            AIpause=true;
+            let possibleMoves = [];
+            for(let i=0;i<moves.length;i++){
+                if (!moves[i]){
+                    possibleMoves.push(i);
+                }
+            }
+            let choice;
+            choice = parseInt(Math.random()*possibleMoves.length);
+            setTimeout(() => playMove(possibleMoves[choice]), 2000);
+        }
     }
     const playMove = (index) => {
         moves[index] = currentMove.getSymbol();
         interface.output.updateSquare(index,currentMove.getSymbol());
         moveCount+=1;
+        AIpause=false;
         if (checkWin()===true){
             interface.output.statusUpdate(`${currentMove.getName()} wins!`)
             interface.output.toggleControls();
@@ -63,7 +76,7 @@ const game = (() => {
             }
         };
     };
-    return{setPlayers,start,playMove,checkWin};
+    return{setPlayers,start,playMove,AIpause,checkWin};
 })();
 
 //input & display object
@@ -71,15 +84,20 @@ const interface = (() => {
     let board = document.querySelector('.board')
     const input = (() => {
         let form=document.querySelector('.gameSetup');
-        // let player1, player2;
         form.addEventListener('submit', function(event){
             event.preventDefault();
-            game.setPlayers(event.target.elements.player1.value,event.target.elements.player2.value);
+            game.setPlayers(
+                event.target.elements.player1.value, 
+                event.target.elements.AI1.checked, 
+                event.target.elements.player2.value, 
+                event.target.elements.AI2.checked
+                );
             game.start();
             form.classList.toggle('d-none');
         });
         board.addEventListener('click', function(event){
-            if(event.target.textContent==='' && game.checkWin()!==true){
+            console.log(game.AIpause)
+            if(event.target.textContent==='' && game.checkWin()!==true && game.AIpause!==true){
                 game.playMove(event.target.getAttribute('index'));
             };
         });
