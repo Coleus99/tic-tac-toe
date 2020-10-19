@@ -24,15 +24,40 @@ const game = (() => {
     };
     const getNextTurn = () => {
         currentMove = (moveCount%2===1? player1 : player2);
-        interface.output.statusUpdate(`${currentMove.getName()}'s turn!`)
+        interface.output.statusUpdate(`${currentMove.getName()}'s turn.`)
     }
     const playMove = (index) => {
         moves[index] = currentMove.getSymbol();
         interface.output.updateSquare(index,currentMove.getSymbol());
         moveCount+=1;
-        getNextTurn();
+        if (checkWin()===true){
+            interface.output.statusUpdate(`${currentMove.getName()} wins!`)
+        }
+        else {
+            getNextTurn();
+        }
     };
-    return{setPlayers,start,playMove};
+    const checkWin = () => {
+        let winningLines = [
+            [0,1,2],
+            [3,4,5],
+            [6,7,8],
+            [0,3,6],
+            [1,4,7],
+            [2,5,8],
+            [0,4,8],
+            [2,4,6]
+        ];
+        for (let i=0;i<winningLines.length;i++){
+            let square1 = moves[winningLines[i][0]];
+            let square2 = moves[winningLines[i][1]];
+            let square3 = moves[winningLines[i][2]];
+            if (square1 && square1===square2 && square1===square3){
+                return true;
+            }
+        };
+    };
+    return{setPlayers,start,playMove,checkWin};
 })();
 
 //input & display object
@@ -48,7 +73,7 @@ const interface = (() => {
             form.classList.toggle('d-none');
         });
         board.addEventListener('click', function(event){
-            if(event.target.textContent===''){
+            if(event.target.textContent==='' && game.checkWin()!==true){
                 game.playMove(event.target.getAttribute('index'));
             }
         });
