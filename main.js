@@ -11,7 +11,7 @@ const game = (() => {
     let gameCount = 0;
     let moveCount, currentMove;
     let moves = [];
-    let AIpause = false;
+    const paused = false;
     const setPlayers = (name1, AIstatus1, name2, AIstatus2) => {
         player1 = playerFactory(name1,'x',AIstatus1);
         player2 = playerFactory(name2,'o',AIstatus2);
@@ -27,7 +27,7 @@ const game = (() => {
         currentMove = ((moveCount+gameCount)%2==0? player1 : player2);
         interface.output.statusUpdate(`${currentMove.getName()}'s ${currentMove.getAIstatus()? 'thinking':'turn'}`)
         if(currentMove.getAIstatus()){
-            AIpause=true;
+            game.paused=true;
             let possibleMoves = [];
             for(let i=0;i<moves.length;i++){
                 if (!moves[i]){
@@ -43,7 +43,7 @@ const game = (() => {
         moves[index] = currentMove.getSymbol();
         interface.output.updateSquare(index,currentMove.getSymbol());
         moveCount+=1;
-        AIpause=false;
+        game.paused=false;
         if (checkWin()===true){
             interface.output.statusUpdate(`${currentMove.getName()} wins!`)
             interface.output.toggleControls();
@@ -76,7 +76,7 @@ const game = (() => {
             }
         };
     };
-    return{setPlayers,start,playMove,AIpause,checkWin};
+    return{setPlayers,start,playMove,paused,checkWin};
 })();
 
 //input & display object
@@ -96,8 +96,8 @@ const interface = (() => {
             form.classList.toggle('d-none');
         });
         board.addEventListener('click', function(event){
-            console.log(game.AIpause)
-            if(event.target.textContent==='' && game.checkWin()!==true && game.AIpause!==true){
+            // if(event.target.textContent==='' && game.checkWin()!==true && game.AIstatus.paused!==true){
+            if(event.target.textContent==='' && game.checkWin()!==true && game.paused!==true){
                 game.playMove(event.target.getAttribute('index'));
             };
         });
