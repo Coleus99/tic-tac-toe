@@ -28,15 +28,17 @@ const game = (() => {
         currentMove = ((moveCount+gameCount)%2==0? player1 : player2);
         opponent = ((moveCount+gameCount)%2==0? player2 : player1);
         interface.output.statusUpdate(`${currentMove.getName()}'s ${currentMove.getAIstatus()? 'thinking':'turn'}`)
-        if(currentMove.getAIstatus() && checkWin()!==true){
+        if(currentMove.getAIstatus() && checkWin(currentMove.getName())!==true){
             game.paused=true;
+            let move;
             const bestMove = (player) => {
+                // debugger;
                 let myTurn = (player === currentMove.getName());
                 let bestScore = (myTurn)? -Infinity : Infinity;
-                let move;
                 for(let i=0;i<9;i++){
                     if (!moves[i]){
-                        moves[i]=(myTurn)? currentMove.getSymbol():opponent.getSymbol();
+                        moves[i]= ( (myTurn)? currentMove.getSymbol():opponent.getSymbol() );
+                        // console.log(`Potential move: square ${i} : ${moves[i]} - board: ${moves}`);
                         let score = minimax(player);
                         moves[i]='';
                         if(myTurn){
@@ -54,19 +56,19 @@ const game = (() => {
                     }
                     // console.log(`bestscore: ${bestScore}, move: ${move}`)
                 }
-                playMove(move);
+                // playMove(move);
             };
             bestMove(currentMove.getName());
+            playMove(move);
             function minimax(player){
-                debugger;
-                let result = game.checkWin();
-                console.log(`${result},${player}`);
-                console.log(moves)
+                let result = game.checkWin(player);
                 if (result){
+                    // debugger;
+                    // console.log(`result: ${result}, player: ${player}, currentMove: ${currentMove.getName()}`);
                     if (result===player){
                         return 1;
                     }
-                    else if (result = 'tie'){
+                    else if (result === 'tie'){
                         return 0;
                     }
                     else{
@@ -100,11 +102,11 @@ const game = (() => {
         interface.output.updateSquare(index,currentMove.getSymbol());
         moveCount+=1;
         game.paused=false;
-        if (checkWin()==='tie'){
+        if (checkWin(currentMove.getName())==='tie'){
             interface.output.statusUpdate(`It's a draw.`)
             interface.output.toggleControls();
         }
-        else if (checkWin()){
+        else if (checkWin(currentMove.getName())){
             interface.output.statusUpdate(`${currentMove.getName()} wins!`)
             interface.output.toggleControls();
         }
@@ -112,7 +114,7 @@ const game = (() => {
             getNextTurn();
         }
     };
-    const checkWin = () => {
+    const checkWin = (playerName) => {
         let winningLines = [
             [0,1,2],
             [3,4,5],
@@ -128,14 +130,14 @@ const game = (() => {
             let square2 = moves[winningLines[i][1]];
             let square3 = moves[winningLines[i][2]];
             if (square1 && square1===square2 && square1===square3){
-                return currentMove.getName();
+                return playerName;
             }
         };
         if(moveCount>9){
             return 'tie'
         }
     };
-    return{setPlayers,start,playMove,paused,checkWin};
+    return{setPlayers,start,playMove,paused,checkWin,currentMove};
 })();
 
 //input & display object
@@ -155,7 +157,6 @@ const interface = (() => {
             form.classList.toggle('d-none');
         });
         board.addEventListener('click', function(event){
-            // if(event.target.textContent==='' && game.checkWin()!==true && game.AIstatus.paused!==true){
             if(event.target.textContent==='' && !game.checkWin() && game.paused!==true){
                 game.playMove(event.target.getAttribute('index'));
             };
