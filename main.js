@@ -11,6 +11,7 @@ const game = (() => {
     let gameCount = 0;
     let moveCount, currentMove;
     let moves = [];
+    let boardCopy;
     const paused = false;
     const setPlayers = (name1, AIstatus1, name2, AIstatus2) => {
         player1 = playerFactory(name1,'x',AIstatus1);
@@ -25,18 +26,73 @@ const game = (() => {
     };
     const getNextTurn = () => {
         currentMove = ((moveCount+gameCount)%2==0? player1 : player2);
+        opponent = ((moveCount+gameCount)%2==0? player2 : player1);
         interface.output.statusUpdate(`${currentMove.getName()}'s ${currentMove.getAIstatus()? 'thinking':'turn'}`)
-        if(currentMove.getAIstatus()){
+        if(currentMove.getAIstatus() && checkWin()!==true){
             game.paused=true;
-            let possibleMoves = [];
-            for(let i=0;i<moves.length;i++){
-                if (!moves[i]){
-                    possibleMoves.push(i);
+            const bestMove = (player) => {
+                let myTurn = (player === currentMove.getName());
+                let bestScore = (myTurn)? -Infinity : Infinity;
+                let move;
+                for(let i=0;i<9;i++){
+                    if (!moves[i]){
+                        moves[i]=(myTurn)? currentMove.getSymbol():opponent.getSymbol();
+                        let score = minimax(player);
+                        moves[i]='';
+                        if(myTurn){
+                            if(score > bestScore){
+                                bestScore = score;
+                                move = i;
+                            }
+                        }
+                        else{
+                            if(score < bestScore){
+                                bestScore = score;
+                                move = i;
+                            }
+                        }
+                    }
+                    // console.log(`bestscore: ${bestScore}, move: ${move}`)
+                }
+                playMove(move);
+            };
+            bestMove(currentMove.getName());
+            function minimax(player){
+                debugger;
+                let result = game.checkWin();
+                console.log(`${result},${player}`);
+                console.log(moves)
+                if (result){
+                    if (result===player){
+                        return 1;
+                    }
+                    else if (result = 'tie'){
+                        return 0;
+                    }
+                    else{
+                        return -1;
+                    }
+                }
+                else{
+                    if(player===currentMove.getName()){
+                        bestMove(opponent.getName())
+                    }
+                    else{
+                        bestMove(currentMove.getName())
+                    }
                 }
             }
-            let choice;
-            choice = parseInt(Math.random()*possibleMoves.length);
-            setTimeout(() => playMove(possibleMoves[choice]), 2000);
+
+            // V1 - random version
+            // let possibleMoves = [];
+            // for(let i=0;i<moves.length;i++){
+            //     if (!moves[i]){
+            //         possibleMoves.push(i);
+            //     }
+            // }
+            // let choice;
+            // choice = parseInt(Math.random()*possibleMoves.length);
+            // setTimeout(() => playMove(possibleMoves[choice]), 2000);
         }
     }
     const playMove = (index) => {
@@ -44,12 +100,12 @@ const game = (() => {
         interface.output.updateSquare(index,currentMove.getSymbol());
         moveCount+=1;
         game.paused=false;
-        if (checkWin()===true){
-            interface.output.statusUpdate(`${currentMove.getName()} wins!`)
+        if (checkWin()==='tie'){
+            interface.output.statusUpdate(`It's a draw.`)
             interface.output.toggleControls();
         }
-        else if (moveCount>9){
-            interface.output.statusUpdate(`It's a draw.`)
+        else if (checkWin()){
+            interface.output.statusUpdate(`${currentMove.getName()} wins!`)
             interface.output.toggleControls();
         }
         else {
@@ -72,9 +128,12 @@ const game = (() => {
             let square2 = moves[winningLines[i][1]];
             let square3 = moves[winningLines[i][2]];
             if (square1 && square1===square2 && square1===square3){
-                return true;
+                return currentMove.getName();
             }
         };
+        if(moveCount>9){
+            return 'tie'
+        }
     };
     return{setPlayers,start,playMove,paused,checkWin};
 })();
@@ -97,7 +156,7 @@ const interface = (() => {
         });
         board.addEventListener('click', function(event){
             // if(event.target.textContent==='' && game.checkWin()!==true && game.AIstatus.paused!==true){
-            if(event.target.textContent==='' && game.checkWin()!==true && game.paused!==true){
+            if(event.target.textContent==='' && !game.checkWin() && game.paused!==true){
                 game.playMove(event.target.getAttribute('index'));
             };
         });

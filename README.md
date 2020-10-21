@@ -4,6 +4,7 @@ https://www.theodinproject.com/courses/javascript/lessons/tic-tac-toe-javascript
 
 ## Features
 * Players can input own names
+* 'AI' player Option where moves are played automatically 
 * take turns to mark the board 
 * at the end of the game return the result
 
@@ -13,4 +14,4 @@ https://www.theodinproject.com/courses/javascript/lessons/tic-tac-toe-javascript
 
 ## Areas for improvement
 * Keep running tally of scores
-* Add AI
+* Use minimax algorithm rather than random AI move
