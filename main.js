@@ -19,7 +19,7 @@ const game = (() => {
     };
     const start = () => {
         gameCount+=1;
-        moves=[,,,,,,,,]
+        moves=['','','','','','','','',''];
         interface.output.initiateBoard();
         moveCount=1;
         getNextTurn();
@@ -30,42 +30,28 @@ const game = (() => {
         interface.output.statusUpdate(`${currentMove.getName()}'s ${currentMove.getAIstatus()? 'thinking':'turn'}`)
         if(currentMove.getAIstatus() && checkWin(currentMove.getName())!==true){
             game.paused=true;
-            let move;
-            const bestMove = (player) => {
-                // debugger;
-                let myTurn = (player === currentMove.getName());
-                let bestScore = (myTurn)? -Infinity : Infinity;
+            function bestMove(){
+                let move;
+                let bestScore = -Infinity;
                 for(let i=0;i<9;i++){
-                    if (!moves[i]){
-                        moves[i]= ( (myTurn)? currentMove.getSymbol():opponent.getSymbol() );
-                        // console.log(`Potential move: square ${i} : ${moves[i]} - board: ${moves}`);
-                        let score = minimax(player);
+                    if (moves[i] == ''){
+                        moves[i]= currentMove.getSymbol();
+                        let score = minimax(false, currentMove.getName());
                         moves[i]='';
-                        if(myTurn){
-                            if(score > bestScore){
-                                bestScore = score;
-                                move = i;
-                            }
-                        }
-                        else{
-                            if(score < bestScore){
-                                bestScore = score;
-                                move = i;
-                            }
+                        if(score > bestScore){
+                            bestScore = score;
+                            move = i;
                         }
                     }
-                    // console.log(`bestscore: ${bestScore}, move: ${move}`)
                 }
-                // playMove(move);
+                playMove(move);
             };
-            bestMove(currentMove.getName());
-            playMove(move);
-            function minimax(player){
-                let result = game.checkWin(player);
+            bestMove();
+            function minimax(isMaximizing, currentPlayer){
+                let result = game.checkWin(currentPlayer);
                 if (result){
-                    // debugger;
-                    // console.log(`result: ${result}, player: ${player}, currentMove: ${currentMove.getName()}`);
-                    if (result===player){
+                    // console.log(`result: ${result}, player: ${currentPlayer}`);
+                    if (result===currentMove.getName()){
                         return 1;
                     }
                     else if (result === 'tie'){
@@ -75,26 +61,32 @@ const game = (() => {
                         return -1;
                     }
                 }
+                if (isMaximizing){
+                    let bestScore = -Infinity;
+                    for(let i=0;i<9;i++){
+                        if (moves[i]===''){
+                            moves[i]= currentMove.getSymbol();
+                            let score = minimax(false, currentMove.getName());
+                            moves[i]='';
+                            bestScore = Math.max(score,bestScore)
+                        }
+                    }
+                    return bestScore;
+                }
                 else{
-                    if(player===currentMove.getName()){
-                        bestMove(opponent.getName())
+                    let bestScore= Infinity;
+                    for(let i=0;i<9;i++){
+                        if (moves[i]===''){
+                            moves[i]= opponent.getSymbol();
+                            let score = minimax(true, opponent.getName());
+                            moves[i]='';
+                            bestScore = Math.min(score,bestScore)
+                        }
                     }
-                    else{
-                        bestMove(currentMove.getName())
-                    }
+                    return bestScore;
                 }
             }
 
-            // V1 - random version
-            // let possibleMoves = [];
-            // for(let i=0;i<moves.length;i++){
-            //     if (!moves[i]){
-            //         possibleMoves.push(i);
-            //     }
-            // }
-            // let choice;
-            // choice = parseInt(Math.random()*possibleMoves.length);
-            // setTimeout(() => playMove(possibleMoves[choice]), 2000);
         }
     }
     const playMove = (index) => {
@@ -129,7 +121,7 @@ const game = (() => {
             let square1 = moves[winningLines[i][0]];
             let square2 = moves[winningLines[i][1]];
             let square3 = moves[winningLines[i][2]];
-            if (square1 && square1===square2 && square1===square3){
+            if (square1!=='' && square1===square2 && square1===square3){
                 return playerName;
             }
         };
