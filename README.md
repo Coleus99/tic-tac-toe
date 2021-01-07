@@ -1,6 +1,7 @@
 # tic-tac-toe
-Create online version of naughts and crosses to practice using factory functions and modules
-https://www.theodinproject.com/courses/javascript/lessons/tic-tac-toe-javascript
+Create online version of naughts and crosses to practice using factory functions and modules. [See live preview](https://coleus99.github.io/tic-tac-toe/index.html)
+
+Task set by the Odin Project lesson: https://www.theodinproject.com/courses/javascript/lessons/tic-tac-toe-javascript
 
 ## Features
 * Players can input own names
